@@ -1,0 +1,61 @@
+```python
+from flask import Flask, request
+import requests
+import os
+
+app = Flask(__name__)
+MEM_API_KEY = os.environ.get("MEM_API_KEY")
+
+@app.route("/omi-webhook", methods=["POST"])
+def handle_omi():
+    data = request.json
+    if not data:
+        return {"status": "no data"}, 400
+
+    structured = data.get("structured", {})
+    title = structured.get("title", "Untitled Conversation")
+    overview = structured.get("overview", "")
+    action_items = structured.get("action_items", [])
+    segments = data.get("transcript_segments", [])
+
+    transcript_lines = []
+    for seg in segments:
+        speaker_name = seg.get("speaker_name", "")
+        text = seg.get("text", "")
+        is_user = seg.get("is_user", False)
+
+        if speaker_name and not speaker_name.startswith("Speaker"):
+            label = speaker_name
+        elif is_user:
+            label = "Me"
+        else:
+            label = None
+
+        if label:
+            transcript_lines.append(f"**{label}:** {text}")
+        else:
+            transcript_lines.append(text)
+
+    action_lines = []
+    for item in action_items:
+        desc = item.get("description", "")
+        done = item.get("completed", False)
+        status = "✅" if done else "☐"
+        action_lines.append(f"{status} {desc}")
+
+    content = f"# {title}\n\n"
+    if overview:
+        content += f"**Summary:** {overview}\n\n"
+    if action_lines:
+        content += "**Action Items:**\n" + "\n".join(action_lines) + "\n\n"
+    if transcript_lines:
+        content += "**Transcript:**\n" + "\n".join(transcript_lines)
+
+    response = requests.post(
+        "https://api.mem.ai/v0/mems",
+        headers={"Authorization": f"ApiAccessToken {MEM_API_KEY}"},
+        json={"content": content}
+    )
+
+    return {"status": "ok", "mem_status": response.status_code}
+```
