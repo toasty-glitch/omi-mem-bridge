@@ -52,7 +52,7 @@ def handle_omi():
         content += "**Transcript:**\n" + "\n".join(transcript_lines)
 
     response = requests.post(
-        "https://api.mem.ai/v0/mems",
+        "https://api.mem.ai/v2/mem-it",
         headers={"Authorization": f"ApiAccessToken {MEM_API_KEY}"},
         json={"content": content}
     )
