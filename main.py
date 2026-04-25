@@ -8,6 +8,7 @@ MEM_API_KEY = os.environ.get("MEM_API_KEY")
 @app.route("/omi-webhook", methods=["POST"])
 def handle_omi():
     data = request.json
+     print("Webhook received!", data) 
     if not data:
         return {"status": "no data"}, 400
 
@@ -56,5 +57,6 @@ def handle_omi():
         json={"content": content}
     )
 
+    print("Mem response:", response.status_code, response.text) 
     return {"status": "ok", "mem_status": response.status_code}
 
