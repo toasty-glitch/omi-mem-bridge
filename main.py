@@ -1,4 +1,4 @@
-```python
+python
 from flask import Flask, request
 import requests
 import os
@@ -58,4 +58,4 @@ def handle_omi():
     )
 
     return {"status": "ok", "mem_status": response.status_code}
-```
+
