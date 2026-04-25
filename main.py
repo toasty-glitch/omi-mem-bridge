@@ -43,7 +43,7 @@ def handle_omi():
         status = "✅" if done else "☐"
         action_lines.append(f"{status} {desc}")
 
-    content = f"# {title}\n\n"
+    content = f"# {title} #omi-capture\n\n
     if overview:
         content += f"**Summary:** {overview}\n\n"
     if action_lines:
